@@ -19,4 +19,4 @@ Pet-проект: WPF-приложение для управления скла�
 ## 🚀 Как запустить
 1. Склонируйте репозиторий:
    ```bash
-   git clone https://github.com/deikunvladislav/pet_projects/tree/bsu/WarehouseApp
+   git clone -b bsu https://github.com/deikunvladislav/pet_projects
