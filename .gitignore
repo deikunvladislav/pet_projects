@@ -1,0 +1,66 @@
+# === exclude all files except CMakeLists.txt & CMakePresets.json ===
+*.gz
+*.env
+!CMakePresets.json
+!CMakeLists.txt
+!requirements.txt
+
+# === exclude Visual Studio artifacts ===
+*.vcxproj
+*.vcxproj.user
+*.sln
+*.filters
+*.user
+.vs/
+
+# === exclude CMake build artifacts ===
+build/
+out/
+x64/
+bin/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# === exclude binaries and temporary files ===
+*.dat
+*.exe
+*.obj
+*.pdb
+*.lib
+*.dll
+*.log
+
+# === exclude JetBrains / CLion / IntelliJ ===
+.idea/
+*.iml
+
+# === exclude Python cache ===
+__pycache__/
+*.pyc
+
+# === exclude Java build artifacts ===
+*.class
+*.jar
+
+# === exclude third-party libraries ===
+lib/
+libs/
+external/
+vendor/
+boost/
+
+# === exclude third-party files ===
+*.zip
+*.txt
+*.json
+*.xml
+*.db
+*.sav
+*.enc
+*.xlsx
+
+# === exclude images ===
+*.png
+*.jpg
