@@ -45,7 +45,7 @@ __pycache__/
 *.jar
 
 # === exclude C# build artifacts ===
-.obj/
+obj/
 
 # === exclude third-party libraries ===
 lib/
