@@ -3,12 +3,15 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using WarehouseApp.Models; 
+using WarehouseApp.Models;
 
 namespace WarehouseApp.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        private const decimal MaxPrice = 1_000_000m;
+        private const int MaxQuantity = 1_000_000;
+
         private int _nextId = 1;
 
         public ObservableCollection<Product> Products { get; set; }
@@ -17,7 +20,8 @@ namespace WarehouseApp.ViewModels
         public Product? SelectedProduct
         {
             get { return _selectedProduct; }
-            set { 
+            set
+            {
                 _selectedProduct = value;
                 OnPropertyChanged();
 
@@ -54,7 +58,8 @@ namespace WarehouseApp.ViewModels
         public ICommand AddCommand { get; set; }
         public ICommand DeleteCommand { get; set; }
         public ICommand UpdateCommand { get; set; }
-        public ICommand ClearCommand { get; set; } 
+        public ICommand ClearCommand { get; set; }
+        public ICommand HelpCommand { get; set; }
 
         public MainViewModel()
         {
@@ -62,8 +67,9 @@ namespace WarehouseApp.ViewModels
 
             AddCommand = new RelayCommand(AddProduct);
             DeleteCommand = new RelayCommand(DeleteProduct, CanDelete);
-            UpdateCommand = new RelayCommand(UpdateProduct, CanUpdate); 
-            ClearCommand = new RelayCommand(ClearInputs, CanClear);
+            UpdateCommand = new RelayCommand(UpdateProduct, CanUpdate);
+            ClearCommand = new RelayCommand(ClearInputs);
+            HelpCommand = new RelayCommand(ShowHelp);
         }
 
         private void AddProduct(object? obj)
@@ -81,9 +87,22 @@ namespace WarehouseApp.ViewModels
                 return;
             }
 
-            if (!int.TryParse(NewProductQuantity, out int parsedQuantity) || parsedQuantity <= 0)
+            if (parsedPrice <= 0 || parsedPrice > MaxPrice)
             {
-                parsedQuantity = 1;
+                MessageBox.Show($"Цена должна быть от 0 до {MaxPrice:N0} руб.", "Валидация");
+                return;
+            }
+
+            if (!int.TryParse(NewProductQuantity, out int parsedQuantity))
+            {
+                MessageBox.Show("Ошибка: Введите корректное количество!", "Валидация");
+                return;
+            }
+
+            if (parsedQuantity <= 0 || parsedQuantity > MaxQuantity)
+            {
+                MessageBox.Show($"Количество должно быть от 1 до {MaxQuantity:N0} шт.", "Валидация");
+                return;
             }
 
             var newProduct = new Product
@@ -91,7 +110,7 @@ namespace WarehouseApp.ViewModels
                 Id = _nextId++,
                 Name = NewProductName,
                 Price = parsedPrice,
-                Quantity = parsedQuantity 
+                Quantity = parsedQuantity
             };
 
             Products.Add(newProduct);
@@ -103,7 +122,10 @@ namespace WarehouseApp.ViewModels
 
         private void DeleteProduct(object? obj)
         {
-            Products.Remove(SelectedProduct!);
+            if (SelectedProduct != null)
+            {
+                Products.Remove(SelectedProduct);
+            }
         }
 
         private bool CanDelete(object? obj)
@@ -113,6 +135,11 @@ namespace WarehouseApp.ViewModels
 
         private void UpdateProduct(object? obj)
         {
+            if (SelectedProduct == null)
+            {
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(NewProductName))
             {
                 MessageBox.Show("Ошибка: Введите название товара!", "Валидация");
@@ -126,12 +153,25 @@ namespace WarehouseApp.ViewModels
                 return;
             }
 
-            if (!int.TryParse(NewProductQuantity, out int parsedQuantity) || parsedQuantity < 0)
+            if (parsedPrice <= 0 || parsedPrice > MaxPrice)
             {
-                parsedQuantity = 0;
+                MessageBox.Show($"Цена должна быть от 0 до {MaxPrice:N0} руб.", "Валидация");
+                return;
             }
 
-            SelectedProduct!.Name = NewProductName;
+            if (!int.TryParse(NewProductQuantity, out int parsedQuantity))
+            {
+                MessageBox.Show("Ошибка: Введите корректное количество!", "Валидация");
+                return;
+            }
+
+            if (parsedQuantity < 0 || parsedQuantity > MaxQuantity)
+            {
+                MessageBox.Show($"Количество должно быть от 0 до {MaxQuantity:N0} шт.", "Валидация");
+                return;
+            }
+
+            SelectedProduct.Name = NewProductName;
             SelectedProduct.Price = parsedPrice;
             SelectedProduct.Quantity = parsedQuantity;
 
@@ -147,15 +187,19 @@ namespace WarehouseApp.ViewModels
         {
             NewProductName = "";
             NewProductPrice = "";
-            NewProductQuantity = "1"; 
-            SelectedProduct = null;  
+            NewProductQuantity = "1";
+            SelectedProduct = null;
         }
 
-        private bool CanClear(object? obj)
+        private void ShowHelp(object? obj)
         {
-            return !string.IsNullOrWhiteSpace(NewProductName)
-                || !string.IsNullOrWhiteSpace(NewProductPrice)
-                || SelectedProduct != null;
+            MessageBox.Show(
+                "Правила ввода данных:\n\n" +
+                "• Название: не пустое\n" +
+                $"• Цена: от 0 до {MaxPrice:N0} руб.\n" +
+                $"• Количество: от 0 до {MaxQuantity:N0} шт.\n\n" +
+                "Эти ограничения защищают программу от переполнения при подсчёте суммы.",
+                "Справка");
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

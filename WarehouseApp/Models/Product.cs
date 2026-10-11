@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace WarehouseApp.Models
@@ -34,13 +35,23 @@ namespace WarehouseApp.Models
             {
                 _quantity = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(TotalPrice)); 
+                OnPropertyChanged(nameof(TotalPrice));
             }
         }
 
         public decimal TotalPrice
         {
-            get { return Price * Quantity; }
+            get
+            {
+                try
+                {
+                    return Price * Quantity;
+                }
+                catch (OverflowException)
+                {
+                    return 0;
+                }
+            }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
