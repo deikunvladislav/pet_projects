@@ -8,7 +8,6 @@
 # === exclude Visual Studio artifacts ===
 *.vcxproj
 *.vcxproj.user
-*.sln
 *.filters
 *.user
 .vs/
